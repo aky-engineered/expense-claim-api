@@ -1,0 +1,96 @@
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Build / target
+/target/
+/build/
+/out/
+
+# Maven wrapper - keep the jar tracked
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar
+
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.settings/
+*.classpath
+*.project
+
+# NetBeans
+/nbproject/private/
+nbbuild/
+build/
+nbdist/
+
+# VS Code
+.vscode/
+
+# Temporary files
+*.tmp
+*~
+*.swp
+
+# Test / reports
+/target/surefire-reports/
+/target/failsafe-reports/
+/coverage-reports/
+
+# Dependency directories
+/.gradle/
+
+# Runtime files
+hs_err_pid*
+.java-repl/
+
+# Environment / local config
+.env
+*.local
+
+# Docker
+Dockerfile
+docker-compose.override.yml
+
+# Archives
+*.7z
+
+# IDEA specific - ignore workspace and local settings but keep project-level files if needed
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/usage.statistics.xml
+
+# Ignore OS thumbnails
+Thumbs.db
+
+# Keep for safety: ignore IDE-specific and OS files
+
+# SQL changelogs generated artifacts (if any)
+*.sql~
+
+# Maven logs
+hs_err_pid*
+
+# Ignore generated Spring Boot devtools files
+.springloaded
+
+# End of .gitignore
