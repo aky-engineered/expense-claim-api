@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: expensedb
+    environment:
+      MYSQL_DATABASE: expensedb
+      MYSQL_USER: expenseuser
+      MYSQL_PASSWORD: expensepass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "expenseuser", "-pexpensepass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - expensedb_data:/var/lib/mysql
+
+volumes:
+  expensedb_data:
