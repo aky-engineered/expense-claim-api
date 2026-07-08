@@ -1,7 +1,7 @@
 --liquibase formatted sql
 --changeset aqif:001-create-schema
 
-CREATE TABLE users
+CREATE TABLE expense_users
 (
     id         BIGINT PRIMARY KEY AUTO_INCREMENT,
     username   VARCHAR(100) NOT NULL UNIQUE,
@@ -13,7 +13,7 @@ CREATE TABLE users
 CREATE TABLE expense_claims
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT,
-    employee_id      BIGINT         NOT NULL REFERENCES users (id),
+    employee_id      BIGINT         NOT NULL REFERENCES expense_users (id),
     description      VARCHAR(255)   NOT NULL,
     amount           DECIMAL(10, 2) NOT NULL,
     date             DATE           NOT NULL,
@@ -29,8 +29,7 @@ CREATE TABLE audit_log
     id           BIGINT PRIMARY KEY AUTO_INCREMENT,
     claim_id     BIGINT    NOT NULL REFERENCES expense_claims (id),
     action       VARCHAR(50),
-    performed_by BIGINT    NOT NULL REFERENCE users(id),
+    performed_by BIGINT    NOT NULL REFERENCES expense_users (id),
     performed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     details      VARCHAR(500)
 );
-)
