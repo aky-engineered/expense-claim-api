@@ -6,6 +6,7 @@ import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.dto.RejectionRequest;
 import com.api.expenses.model.entity.ClaimStatus;
 import com.api.expenses.model.entity.ExpenseClaim;
+import com.api.expenses.model.entity.User;
 import com.api.expenses.repository.ExpenseClaimRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,6 +21,7 @@ public class ApprovalService {
 
     private final ServiceHelper helper;
     private final ExpenseClaimRepository claimRepository;
+    private final AuditService auditService;
 
     @PreAuthorize("hasRole('APPROVER')")
     public List<ClaimResponse> getAllPendingClaims() {
@@ -34,11 +36,14 @@ public class ApprovalService {
         ExpenseClaim claim = claimRepository.findById(claimId)
                 .orElseThrow(() -> new NotFoundException("Failed to find claim", claimId));
 
-        helper.resolveUser(currentUser);
+        User approver = helper.resolveUser(currentUser);
         validateIsPending(claim);
 
         claim.setStatus(ClaimStatus.APPROVED);
         ExpenseClaim saved = claimRepository.save(claim);
+
+        auditService.createAudit(saved, "APPROVED", approver,
+                "Approved by " + approver.getUsername());
 
         return helper.toResponse(saved);
     }
@@ -49,12 +54,15 @@ public class ApprovalService {
         ExpenseClaim claim = claimRepository.findById(claimId)
                 .orElseThrow(() -> new NotFoundException("Failed to find claim", claimId));
 
-        helper.resolveUser(currentUser);
+        User approver = helper.resolveUser(currentUser);
         validateIsPending(claim);
 
         claim.setStatus(ClaimStatus.REJECTED);
         claim.setRejectionReason(request.getReason());
         ExpenseClaim saved = claimRepository.save(claim);
+
+        auditService.createAudit(saved, "REJECTED", approver,
+                "Rejected by " + approver.getUsername());
 
         return helper.toResponse(saved);
     }

@@ -21,6 +21,7 @@ public class ClaimService {
 
     private final ExpenseClaimRepository claimRepository;
     private final ServiceHelper helper;
+    private final AuditService auditService;
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ClaimResponse submitClaim(final ClaimRequest request, final UserDetails currentUser) {
@@ -36,6 +37,10 @@ public class ClaimService {
                 .build();
 
         ExpenseClaim saved = claimRepository.save(claim);
+
+        auditService.createAudit(saved, "SUBMITTED", employee,
+                String.format("Claim submitted: £%.2f for %s on %s",
+                        saved.getAmount(), saved.getCategory(), saved.getDate()));
 
         return helper.toResponse(saved);
     }

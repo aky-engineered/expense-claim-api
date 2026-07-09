@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
@@ -37,14 +36,16 @@ class ApprovalServiceTest {
     @Mock
     private UserDetails currentUser;
 
-    @Autowired
+    @Mock
+    private AuditService auditService;
+
     private ApprovalService approvalService;
 
 
     @BeforeEach
     void setUp() {
         ServiceHelper helper = new ServiceHelper(userRepository);
-        approvalService = new ApprovalService(helper, claimRepository);
+        approvalService = new ApprovalService(helper, claimRepository, auditService);
     }
 
     @Test

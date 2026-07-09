@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface AudiLogRepository extends JpaRepository<AuditLog, Integer> {
+public interface AuditLogRepository extends JpaRepository<AuditLog, Integer> {
     List<AuditLog> findAllByClaimOrderByPerformedAtAsc(ExpenseClaim claim);
 }
