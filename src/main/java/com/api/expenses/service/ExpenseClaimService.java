@@ -67,7 +67,14 @@ public class ExpenseClaimService {
         return toResponse(claim);
     }
 
-
+    @PreAuthorize("hasRole('APPROVER')")
+    public List<ClaimResponse> getAllPendingClaims() {
+        return claimRepository.findAllByStatus(ClaimStatus.PENDING)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+    
     private User resolveUser(final UserDetails userDetails) {
         String username = userDetails.getUsername();
         return userRepository.findByUsername(username)
