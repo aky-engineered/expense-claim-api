@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.api.expenses.exception.NotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -169,4 +171,72 @@ class ExpenseClaimServiceTest {
 
         assertThrows(UsernameNotFoundException.class, () -> claimService.getMyClaims(currentUser));
     }
+
+    @Test
+    void getClaimById_WithExistingClaimAndOwner_ReturnsResponse() {
+        User employee = new User();
+        employee.setId(1);
+        employee.setUsername("owner");
+
+        ExpenseClaim claim = ExpenseClaim.builder()
+                .id(1)
+                .employee(employee)
+                .description("Taxi fare")
+                .amount(new BigDecimal("20.00"))
+                .date(LocalDate.of(2025, 5, 5))
+                .category(Category.TRAVEL)
+                .status(ClaimStatus.PENDING)
+                .createdAt(LocalDateTime.of(2025, Month.MAY, 5, 10, 0))
+                .build();
+
+        when(claimRepository.findById(1)).thenReturn(Optional.of(claim));
+        when(currentUser.getUsername()).thenReturn("owner");
+        when(userRepository.findByUsername("owner")).thenReturn(Optional.of(employee));
+
+        ClaimResponse response = claimService.getClaimById(1, currentUser);
+
+        assertNotNull(response);
+        assertEquals(1, response.getId());
+        assertEquals("owner", response.getEmployeeUserName());
+        assertEquals(new BigDecimal("20.00"), response.getAmount());
+        assertEquals(Category.TRAVEL, response.getCategory());
+        assertEquals(ClaimStatus.PENDING, response.getStatus());
+    }
+
+    @Test
+    void getClaimById_NotFound_ThrowsNotFoundException() {
+        when(claimRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> claimService.getClaimById(999, currentUser));
+    }
+
+    @Test
+    void getClaimById_NotOwner_ThrowsAccessDeniedException() {
+        User owner = new User();
+        owner.setId(1);
+        owner.setUsername("owner");
+
+        ExpenseClaim claim = ExpenseClaim.builder()
+                .id(1)
+                .employee(owner)
+                .description("Dinner")
+                .amount(new BigDecimal("30.00"))
+                .date(LocalDate.of(2025, 4, 4))
+                .category(Category.MEALS)
+                .status(ClaimStatus.PENDING)
+                .createdAt(LocalDateTime.of(2025, Month.APRIL, 4, 19, 0))
+                .build();
+
+        when(claimRepository.findById(1)).thenReturn(Optional.of(claim));
+
+        User other = new User();
+        other.setId(2);
+        other.setUsername("other");
+
+        when(currentUser.getUsername()).thenReturn("other");
+        when(userRepository.findByUsername("other")).thenReturn(Optional.of(other));
+
+        assertThrows(AccessDeniedException.class, () -> claimService.getClaimById(1, currentUser));
+    }
+
 }
