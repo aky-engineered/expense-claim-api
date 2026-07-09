@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -105,5 +107,66 @@ class ExpenseClaimServiceTest {
 
         assertThrows(UsernameNotFoundException.class, () -> claimService.submitClaim(request, currentUser));
         verify(claimRepository, never()).save(any());
+    }
+
+    @Test
+    void getMyClaims_WithExistingClaims_ReturnsResponses() {
+        User employee = new User();
+        employee.setId(1);
+        employee.setUsername("jane.doe");
+
+        when(currentUser.getUsername()).thenReturn("jane.doe");
+        when(userRepository.findByUsername("jane.doe")).thenReturn(Optional.of(employee));
+
+        ExpenseClaim claim = ExpenseClaim.builder()
+                .id(10)
+                .employee(employee)
+                .description("Lunch with client")
+                .amount(new BigDecimal("25.00"))
+                .date(LocalDate.of(2025, 6, 1))
+                .category(Category.MEALS)
+                .status(ClaimStatus.PENDING)
+                .createdAt(LocalDateTime.of(2025, Month.JUNE, 1, 12, 0))
+                .build();
+
+        when(claimRepository.findAllByEmployee(employee)).thenReturn(List.of(claim));
+
+        List<ClaimResponse> responses = claimService.getMyClaims(currentUser);
+
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
+
+        ClaimResponse resp = responses.get(0);
+        assertEquals(10, resp.getId());
+        assertEquals("jane.doe", resp.getEmployeeUserName());
+        assertEquals("Lunch with client", resp.getDescription());
+        assertEquals(new BigDecimal("25.00"), resp.getAmount());
+        assertEquals(Category.MEALS, resp.getCategory());
+        assertEquals(ClaimStatus.PENDING, resp.getStatus());
+    }
+
+    @Test
+    void getMyClaims_WithNoClaims_ReturnsEmptyList() {
+        User employee = new User();
+        employee.setId(2);
+        employee.setUsername("no.claims");
+
+        when(currentUser.getUsername()).thenReturn("no.claims");
+        when(userRepository.findByUsername("no.claims")).thenReturn(Optional.of(employee));
+
+        when(claimRepository.findAllByEmployee(employee)).thenReturn(List.of());
+
+        List<ClaimResponse> responses = claimService.getMyClaims(currentUser);
+
+        assertNotNull(responses);
+        assertEquals(0, responses.size());
+    }
+
+    @Test
+    void getMyClaims_WithNonExistentUser_ThrowsException() {
+        when(currentUser.getUsername()).thenReturn("unknown");
+        when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> claimService.getMyClaims(currentUser));
     }
 }

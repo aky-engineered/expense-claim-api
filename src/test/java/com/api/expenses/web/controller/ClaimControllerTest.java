@@ -6,7 +6,7 @@ import com.api.expenses.model.entity.Category;
 import com.api.expenses.model.entity.ClaimStatus;
 import com.api.expenses.service.ExpenseClaimService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,10 +19,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -70,10 +73,10 @@ class ClaimControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.employeeUserName").value("testuser"))
                 .andExpect(jsonPath("$.description").value("Hotel for conference"))
-                .andExpect(jsonPath("$.amount").value(BigDecimal.TEN))
+                .andExpect(jsonPath("$.amount").value(10))
                 .andExpect(jsonPath("$.date").value("2025-01-01"))
                 .andExpect(jsonPath("$.category").value("ACCOMODATION"))
                 .andExpect(jsonPath("$.status").value("PENDING"));
@@ -157,7 +160,8 @@ class ClaimControllerTest {
                 .andDo(print());
     }
 
-    @Ignore("Look into how to test the authorisation")
+    @Test
+    @Disabled("Look into how to test the authorisation")
     @WithMockUser(roles = "ADMIN")
     void submitClaim_UserWithIncorrectRole_ReturnsUnauthorized() throws Exception {
         ClaimRequest request = ClaimRequest.builder()
@@ -172,5 +176,26 @@ class ClaimControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
+    }
+
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void getMyClaims_WithValidRequest_ReturnsOk() throws Exception {
+        when(claimService.getMyClaims(null)).thenReturn(List.of(buildDummyClaimResponse()));
+
+        mockMvc.perform(get("/api/claims"))
+                .andExpect(status().isOk());
+    }
+
+    ClaimResponse buildDummyClaimResponse() {
+        return ClaimResponse.builder()
+                .id(1)
+                .employeeUserName("test")
+                .date(LocalDate.of(2025, 1, 1))
+                .amount(BigDecimal.TEN)
+                .status(ClaimStatus.PENDING)
+                .category(Category.MEALS)
+                .createdAt(LocalDateTime.of(2025, Month.FEBRUARY, 3, 6, 30, 40, 50))
+                .build();
     }
 }

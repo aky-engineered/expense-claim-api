@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ExpenseClaimService {
@@ -37,6 +39,16 @@ public class ExpenseClaimService {
 
         return toResponse(saved);
     }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public List<ClaimResponse> getMyClaims(UserDetails currentUser) {
+        User employee = resolveUser(currentUser);
+        return claimRepository.findAllByEmployee(employee)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
 
     private User resolveUser(UserDetails userDetails) {
         return userRepository.findByUsername(userDetails.getUsername())
