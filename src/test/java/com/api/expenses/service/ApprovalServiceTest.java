@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
@@ -36,6 +37,7 @@ class ApprovalServiceTest {
     @Mock
     private UserDetails currentUser;
 
+    @Autowired
     private ApprovalService approvalService;
 
 

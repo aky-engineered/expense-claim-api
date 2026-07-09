@@ -1,10 +1,11 @@
 package com.api.expenses.web.controller;
 
+import com.api.expenses.Helper;
 import com.api.expenses.model.dto.ClaimRequest;
 import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.entity.Category;
 import com.api.expenses.model.entity.ClaimStatus;
-import com.api.expenses.service.ExpenseClaimService;
+import com.api.expenses.service.ClaimService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
@@ -39,10 +39,13 @@ class ClaimControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ExpenseClaimService claimService;
+    private ClaimService claimService;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private Helper helper;
 
     @Test
     @WithMockUser(roles = "EMPLOYEE")
@@ -181,7 +184,7 @@ class ClaimControllerTest {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void getMyClaims_WithValidRequest_ReturnsOk() throws Exception {
-        when(claimService.getMyClaims(null)).thenReturn(List.of(buildDummyClaimResponse()));
+        when(claimService.getMyClaims(null)).thenReturn(List.of(helper.buildDummyClaimResponse()));
 
         mockMvc.perform(get("/api/claims"))
                 .andExpect(status().isOk());
@@ -190,7 +193,7 @@ class ClaimControllerTest {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void getClaimById_WithValidRequest_ReturnsOk() throws Exception {
-        when(claimService.getClaimById(any(), any())).thenReturn(buildDummyClaimResponse());
+        when(claimService.getClaimById(any(), any())).thenReturn(helper.buildDummyClaimResponse());
 
         mockMvc.perform(get("/api/claims/1"))
                 .andExpect(status().isOk())
@@ -215,18 +218,6 @@ class ClaimControllerTest {
         when(claimService.getClaimById(any(), any())).thenThrow(new org.springframework.security.access.AccessDeniedException("You do not have access to this claim"));
 
         mockMvc.perform(get("/api/claims/1"))
-                .andExpect(status().isForbidden());
-    }
-
-    ClaimResponse buildDummyClaimResponse() {
-        return ClaimResponse.builder()
-                .id(1)
-                .employeeUserName("test")
-                .date(LocalDate.of(2025, 1, 1))
-                .amount(BigDecimal.TEN)
-                .status(ClaimStatus.PENDING)
-                .category(Category.MEALS)
-                .createdAt(LocalDateTime.of(2025, Month.FEBRUARY, 3, 6, 30, 40, 50))
-                .build();
+                .andExpect(status().isUnauthorized());
     }
 }

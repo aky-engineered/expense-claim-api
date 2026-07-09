@@ -2,7 +2,7 @@ package com.api.expenses.web.controller;
 
 import com.api.expenses.model.dto.ClaimRequest;
 import com.api.expenses.model.dto.ClaimResponse;
-import com.api.expenses.service.ExpenseClaimService;
+import com.api.expenses.service.ClaimService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,7 +28,7 @@ import java.util.List;
 @Tag(name = "Expense Claims")
 public class ClaimController {
 
-    private final ExpenseClaimService claimService;
+    private final ClaimService claimService;
 
     @PostMapping
     @Operation(summary = "Submit a new expense claim",

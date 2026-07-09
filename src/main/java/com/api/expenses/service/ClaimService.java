@@ -37,7 +37,7 @@ public class ClaimService {
 
         ExpenseClaim saved = claimRepository.save(claim);
 
-        return toResponse(saved);
+        return helper.toResponse(saved);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
@@ -64,13 +64,5 @@ public class ClaimService {
         }
 
         return helper.toResponse(claim);
-    }
-
-    @PreAuthorize("hasRole('APPROVER')")
-    public List<ClaimResponse> getAllPendingClaims() {
-        return claimRepository.findAllByStatus(ClaimStatus.PENDING)
-                .stream()
-                .map(helper::toResponse)
-                .toList();
     }
 }

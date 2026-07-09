@@ -8,7 +8,7 @@ import com.api.expenses.model.entity.ClaimStatus;
 import com.api.expenses.security.JwtAuthenticationFilter;
 import com.api.expenses.security.JwtService;
 import com.api.expenses.security.UserDetailsServiceImpl;
-import com.api.expenses.service.ExpenseClaimService;
+import com.api.expenses.service.ClaimService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,7 +40,7 @@ public class ClaimControllerAuthorisationTest {
     private UserDetailsServiceImpl userDetailsService;
 
     @MockitoBean
-    private ExpenseClaimService expenseClaimService;
+    private ClaimService expenseClaimService;
 
     @Autowired
     private MockMvc mockMvc;
