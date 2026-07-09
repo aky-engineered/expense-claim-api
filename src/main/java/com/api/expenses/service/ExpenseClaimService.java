@@ -1,7 +1,7 @@
 package com.api.expenses.service;
 
 import com.api.expenses.model.dto.ClaimRequest;
-import com.api.expenses.model.entity.ClaimResponse;
+import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.entity.ClaimStatus;
 import com.api.expenses.model.entity.ExpenseClaim;
 import com.api.expenses.model.entity.User;

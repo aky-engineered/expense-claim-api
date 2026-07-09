@@ -1,8 +1,8 @@
 package com.api.expenses.service;
 
 import com.api.expenses.model.dto.ClaimRequest;
+import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.entity.Category;
-import com.api.expenses.model.entity.ClaimResponse;
 import com.api.expenses.model.entity.ClaimStatus;
 import com.api.expenses.model.entity.ExpenseClaim;
 import com.api.expenses.model.entity.User;
@@ -21,9 +21,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ExpenseClaimServiceTest {

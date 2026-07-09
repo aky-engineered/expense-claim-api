@@ -1,7 +1,7 @@
 package com.api.expenses.web.controller;
 
 import com.api.expenses.model.dto.ClaimRequest;
-import com.api.expenses.model.entity.ClaimResponse;
+import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.service.ExpenseClaimService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

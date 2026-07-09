@@ -1,5 +1,7 @@
-package com.api.expenses.model.entity;
+package com.api.expenses.model.dto;
 
+import com.api.expenses.model.entity.Category;
+import com.api.expenses.model.entity.ClaimStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
