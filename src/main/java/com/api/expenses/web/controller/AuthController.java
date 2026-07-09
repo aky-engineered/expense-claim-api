@@ -1,4 +1,4 @@
-package com.api.expenses.controller;
+package com.api.expenses.web.controller;
 
 import com.api.expenses.model.dto.AuthResponse;
 import com.api.expenses.model.dto.LoginRequest;
