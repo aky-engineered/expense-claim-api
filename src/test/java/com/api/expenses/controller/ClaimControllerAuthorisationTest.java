@@ -1,7 +1,6 @@
-package com.api.expenses.web.controller;
+package com.api.expenses.controller;
 
 import com.api.expenses.config.SecurityConfig;
-import com.api.expenses.controller.ClaimController;
 import com.api.expenses.model.dto.ClaimRequest;
 import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.entity.Category;
