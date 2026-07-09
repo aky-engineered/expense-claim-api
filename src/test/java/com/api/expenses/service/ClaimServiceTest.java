@@ -45,14 +45,16 @@ class ClaimServiceTest {
     @Mock
     private UserDetails currentUser;
 
-    @Autowired
     private ClaimService claimService;
+
+    @Mock
+    private AuditService auditService;
 
 
     @BeforeEach
     void setUp() {
         ServiceHelper helper = new ServiceHelper(userRepository);
-        claimService = new ClaimService(claimRepository, helper);
+        claimService = new ClaimService(claimRepository, helper, auditService);
     }
 
     @Test
