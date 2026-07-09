@@ -1,4 +1,4 @@
-package com.api.expenses.web.exception;
+package com.api.expenses.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;

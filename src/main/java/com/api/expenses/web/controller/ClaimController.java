@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,5 +52,20 @@ public class ClaimController {
             @AuthenticationPrincipal UserDetails currentUser) {
 
         return ResponseEntity.ok(claimService.getMyClaims(currentUser));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a claim by ID",
+            security = @SecurityRequirement(name = "Bearer Auth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Claim found"),
+            @ApiResponse(responseCode = "403", description = "Not your claim"),
+            @ApiResponse(responseCode = "404", description = "Claim not found")
+    })
+    public ResponseEntity<ClaimResponse> getById(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal UserDetails currentUser) {
+
+        return ResponseEntity.ok(claimService.getClaimById(id, currentUser));
     }
 }

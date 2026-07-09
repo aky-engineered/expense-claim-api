@@ -1,5 +1,6 @@
 package com.api.expenses.service;
 
+import com.api.expenses.exception.NotFoundException;
 import com.api.expenses.model.dto.ClaimRequest;
 import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.entity.ClaimStatus;
@@ -8,9 +9,9 @@ import com.api.expenses.model.entity.User;
 import com.api.expenses.repository.ExpenseClaimRepository;
 import com.api.expenses.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class ExpenseClaimService {
     private final UserRepository userRepository;
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ClaimResponse submitClaim(ClaimRequest request, UserDetails currentUser) {
+    public ClaimResponse submitClaim(final ClaimRequest request, final UserDetails currentUser) {
         User employee = resolveUser(currentUser);
 
         ExpenseClaim claim = ExpenseClaim.builder()
@@ -41,7 +42,7 @@ public class ExpenseClaimService {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public List<ClaimResponse> getMyClaims(UserDetails currentUser) {
+    public List<ClaimResponse> getMyClaims(final UserDetails currentUser) {
         User employee = resolveUser(currentUser);
         return claimRepository.findAllByEmployee(employee)
                 .stream()
@@ -49,10 +50,28 @@ public class ExpenseClaimService {
                 .toList();
     }
 
+    @PreAuthorize("hasAnyRole('EMPLOYEE')")
+    public ClaimResponse getClaimById(final Integer claimId, final UserDetails currentUser) {
+        ExpenseClaim claim = claimRepository.findById(claimId)
+                .orElseThrow(() -> new NotFoundException("claim", claimId));
 
-    private User resolveUser(UserDetails userDetails) {
-        return userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User requester = resolveUser(currentUser);
+
+        // BOLA check — employees can only see their own claims
+        boolean isOwner = claim.getEmployee().getId().equals(requester.getId());
+
+        if (!isOwner) {
+            throw new AccessDeniedException("You do not have access to this claim");
+        }
+
+        return toResponse(claim);
+    }
+
+
+    private User resolveUser(final UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("username", username));
     }
 
     private ClaimResponse toResponse(ExpenseClaim claim) {

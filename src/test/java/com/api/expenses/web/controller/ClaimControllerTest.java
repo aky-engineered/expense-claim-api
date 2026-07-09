@@ -190,7 +190,7 @@ class ClaimControllerTest {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void getClaimById_WithValidRequest_ReturnsOk() throws Exception {
-        when(claimService.getClaimById(1, any())).thenReturn(buildDummyClaimResponse());
+        when(claimService.getClaimById(any(), any())).thenReturn(buildDummyClaimResponse());
 
         mockMvc.perform(get("/api/claims/1"))
                 .andExpect(status().isOk())
@@ -203,7 +203,7 @@ class ClaimControllerTest {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void getClaimById_NotFound_ReturnsNotFound() throws Exception {
-        when(claimService.getClaimById(999, any())).thenThrow(new com.api.expenses.exception.NotFoundException("claim", 999));
+        when(claimService.getClaimById(any(), any())).thenThrow(new com.api.expenses.exception.NotFoundException("claim", 999));
 
         mockMvc.perform(get("/api/claims/999"))
                 .andExpect(status().isNotFound());
@@ -212,7 +212,7 @@ class ClaimControllerTest {
     @Test
     @WithMockUser(roles = "EMPLOYEE")
     void getClaimById_NotOwner_ReturnsForbidden() throws Exception {
-        when(claimService.getClaimById(1, any())).thenThrow(new org.springframework.security.access.AccessDeniedException("You do not have access to this claim"));
+        when(claimService.getClaimById(any(), any())).thenThrow(new org.springframework.security.access.AccessDeniedException("You do not have access to this claim"));
 
         mockMvc.perform(get("/api/claims/1"))
                 .andExpect(status().isForbidden());

@@ -1,5 +1,6 @@
 package com.api.expenses.service;
 
+import com.api.expenses.exception.NotFoundException;
 import com.api.expenses.model.dto.ClaimRequest;
 import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.entity.Category;
@@ -13,10 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import com.api.expenses.exception.NotFoundException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -107,7 +106,7 @@ class ExpenseClaimServiceTest {
         when(currentUser.getUsername()).thenReturn("nonexistent");
         when(userRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
 
-        assertThrows(UsernameNotFoundException.class, () -> claimService.submitClaim(request, currentUser));
+        assertThrows(NotFoundException.class, () -> claimService.submitClaim(request, currentUser));
         verify(claimRepository, never()).save(any());
     }
 
@@ -169,7 +168,7 @@ class ExpenseClaimServiceTest {
         when(currentUser.getUsername()).thenReturn("unknown");
         when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
-        assertThrows(UsernameNotFoundException.class, () -> claimService.getMyClaims(currentUser));
+        assertThrows(NotFoundException.class, () -> claimService.getMyClaims(currentUser));
     }
 
     @Test
