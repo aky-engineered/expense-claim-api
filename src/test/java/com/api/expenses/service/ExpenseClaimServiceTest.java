@@ -44,11 +44,13 @@ class ExpenseClaimServiceTest {
     @Mock
     private UserDetails currentUser;
 
-    private ExpenseClaimService claimService;
+    private ClaimService claimService;
+    
 
     @BeforeEach
     void setUp() {
-        claimService = new ExpenseClaimService(claimRepository, userRepository);
+        ServiceHelper helper = new ServiceHelper(userRepository);
+        claimService = new ClaimService(claimRepository, helper);
     }
 
     @Test
