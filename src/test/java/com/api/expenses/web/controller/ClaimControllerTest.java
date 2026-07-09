@@ -187,6 +187,37 @@ class ClaimControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void getClaimById_WithValidRequest_ReturnsOk() throws Exception {
+        when(claimService.getClaimById(1, any())).thenReturn(buildDummyClaimResponse());
+
+        mockMvc.perform(get("/api/claims/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.employeeUserName").value("test"))
+                .andExpect(jsonPath("$.amount").value(10))
+                .andExpect(jsonPath("$.category").value("MEALS"));
+    }
+
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void getClaimById_NotFound_ReturnsNotFound() throws Exception {
+        when(claimService.getClaimById(999, any())).thenThrow(new com.api.expenses.exception.NotFoundException("claim", 999));
+
+        mockMvc.perform(get("/api/claims/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void getClaimById_NotOwner_ReturnsForbidden() throws Exception {
+        when(claimService.getClaimById(1, any())).thenThrow(new org.springframework.security.access.AccessDeniedException("You do not have access to this claim"));
+
+        mockMvc.perform(get("/api/claims/1"))
+                .andExpect(status().isForbidden());
+    }
+
     ClaimResponse buildDummyClaimResponse() {
         return ClaimResponse.builder()
                 .id(1)
