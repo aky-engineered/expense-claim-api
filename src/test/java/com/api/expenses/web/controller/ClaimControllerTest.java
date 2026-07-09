@@ -218,6 +218,30 @@ class ClaimControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @WithMockUser(roles = "APPROVER")
+    void getPending_WithApprover_ReturnsOk() throws Exception {
+        when(claimService.getAllPendingClaims()).thenReturn(List.of(buildDummyClaimResponse()));
+
+        mockMvc.perform(get("/api/approvals/pending"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].employeeUserName").value("test"));
+    }
+
+    @Test
+    @WithMockUser(roles = "EMPLOYEE")
+    void getPending_WithEmployee_ReturnsForbidden() throws Exception {
+        mockMvc.perform(get("/api/approvals/pending"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getPending_Unauthenticated_ReturnsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/approvals/pending"))
+                .andExpect(status().isUnauthorized());
+    }
+
     ClaimResponse buildDummyClaimResponse() {
         return ClaimResponse.builder()
                 .id(1)
