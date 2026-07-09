@@ -7,14 +7,14 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+public class TestcontainersConfiguration {
 
-	@Bean
-	@ServiceConnection
-	MySQLContainer<?> mysqlContainer() {
-		return new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
-			.withCommand("--default-authentication-plugin=mysql_native_password")
-			.withReuse(true);
-	}
+    @Bean
+    @ServiceConnection
+    MySQLContainer<?> mysqlContainer() {
+        return new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
+                .withCommand("--default-authentication-plugin=mysql_native_password")
+                .withReuse(true);
+    }
 
 }
