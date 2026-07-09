@@ -7,7 +7,6 @@ import com.api.expenses.model.entity.ClaimStatus;
 import com.api.expenses.model.entity.ExpenseClaim;
 import com.api.expenses.model.entity.User;
 import com.api.expenses.repository.ExpenseClaimRepository;
-import com.api.expenses.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,14 +17,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ExpenseClaimService {
+public class ClaimService {
 
     private final ExpenseClaimRepository claimRepository;
-    private final UserRepository userRepository;
+    private final ServiceHelper helper;
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ClaimResponse submitClaim(final ClaimRequest request, final UserDetails currentUser) {
-        User employee = resolveUser(currentUser);
+        User employee = helper.resolveUser(currentUser);
 
         ExpenseClaim claim = ExpenseClaim.builder()
                 .employee(employee)
@@ -43,10 +42,10 @@ public class ExpenseClaimService {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     public List<ClaimResponse> getMyClaims(final UserDetails currentUser) {
-        User employee = resolveUser(currentUser);
+        User employee = helper.resolveUser(currentUser);
         return claimRepository.findAllByEmployee(employee)
                 .stream()
-                .map(this::toResponse)
+                .map(helper::toResponse)
                 .toList();
     }
 
@@ -55,7 +54,7 @@ public class ExpenseClaimService {
         ExpenseClaim claim = claimRepository.findById(claimId)
                 .orElseThrow(() -> new NotFoundException("claim", claimId));
 
-        User requester = resolveUser(currentUser);
+        User requester = helper.resolveUser(currentUser);
 
         // BOLA check — employees can only see their own claims
         boolean isOwner = claim.getEmployee().getId().equals(requester.getId());
@@ -64,33 +63,14 @@ public class ExpenseClaimService {
             throw new AccessDeniedException("You do not have access to this claim");
         }
 
-        return toResponse(claim);
+        return helper.toResponse(claim);
     }
 
     @PreAuthorize("hasRole('APPROVER')")
     public List<ClaimResponse> getAllPendingClaims() {
         return claimRepository.findAllByStatus(ClaimStatus.PENDING)
                 .stream()
-                .map(this::toResponse)
+                .map(helper::toResponse)
                 .toList();
-    }
-    
-    private User resolveUser(final UserDetails userDetails) {
-        String username = userDetails.getUsername();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("username", username));
-    }
-
-    private ClaimResponse toResponse(ExpenseClaim claim) {
-        return new ClaimResponse(
-                claim.getId(),
-                claim.getEmployee().getUsername(),
-                claim.getDescription(),
-                claim.getAmount(),
-                claim.getDate(),
-                claim.getCategory(),
-                claim.getStatus(),
-                claim.getCreatedAt()
-        );
     }
 }
