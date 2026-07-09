@@ -3,9 +3,9 @@ package com.api.expenses.web.controller;
 import com.api.expenses.model.dto.ClaimResponse;
 import com.api.expenses.model.entity.Category;
 import com.api.expenses.model.entity.ClaimStatus;
-import com.api.expenses.service.ExpenseClaimService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,15 +34,32 @@ class ApprovalControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ExpenseClaimService claimService;
+    private ApprovalService approvalService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
+    @BeforeEach
+    void setUp() {
+    }
+
+    private ClaimResponse buildDummyClaimResponse() {
+        return ClaimResponse.builder()
+                .id(1)
+                .employeeUserName("test")
+                .date(LocalDate.of(2025, 1, 1))
+                .amount(BigDecimal.TEN)
+                .status(ClaimStatus.PENDING)
+                .category(Category.MEALS)
+                .createdAt(LocalDateTime.of(2025, Month.FEBRUARY, 3, 6, 30, 40, 50))
+                .build();
+    }
+
     @Test
     @WithMockUser(roles = "APPROVER")
     void getPending_WithApprover_ReturnsOk() throws Exception {
-        when(claimService.getAllPendingClaims()).thenReturn(List.of(buildDummyClaimResponse()));
+
+        when(approvalService.getAllPendingClaims()).thenReturn(List.of(buildDummyClaimResponse()));
 
         mockMvc.perform(get("/api/approvals/pending"))
                 .andExpect(status().isOk())
@@ -66,18 +83,5 @@ class ApprovalControllerTest {
     void getPending_Unauthenticated_ReturnsUnauthorized() throws Exception {
         mockMvc.perform(get("/api/approvals/pending"))
                 .andExpect(status().isUnauthorized());
-    }
-
-    //Todo - Extract this method to a helper
-    ClaimResponse buildDummyClaimResponse() {
-        return ClaimResponse.builder()
-                .id(1)
-                .employeeUserName("test")
-                .date(LocalDate.of(2025, 1, 1))
-                .amount(BigDecimal.TEN)
-                .status(ClaimStatus.PENDING)
-                .category(Category.MEALS)
-                .createdAt(LocalDateTime.of(2025, Month.FEBRUARY, 3, 6, 30, 40, 50))
-                .build();
     }
 }
