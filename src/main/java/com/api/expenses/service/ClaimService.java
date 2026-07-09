@@ -26,7 +26,7 @@ public class ClaimService {
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ClaimResponse submitClaim(final ClaimRequest request, final UserDetails currentUser) {
         User employee = helper.resolveUser(currentUser);
-
+        
         ExpenseClaim claim = ExpenseClaim.builder()
                 .employee(employee)
                 .description(request.getDescription())

@@ -1,7 +1,9 @@
 package com.api.expenses.controller;
 
+import com.api.expenses.model.dto.AuditResponse;
 import com.api.expenses.model.dto.ClaimRequest;
 import com.api.expenses.model.dto.ClaimResponse;
+import com.api.expenses.service.AuditService;
 import com.api.expenses.service.ClaimService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,6 +31,7 @@ import java.util.List;
 public class ClaimController {
 
     private final ClaimService claimService;
+    private final AuditService auditService;
 
     @PostMapping
     @Operation(summary = "Submit a new expense claim",
@@ -67,5 +70,15 @@ public class ClaimController {
             @AuthenticationPrincipal UserDetails currentUser) {
 
         return ResponseEntity.ok(claimService.getClaimById(id, currentUser));
+    }
+
+    @GetMapping("/{id}/audit")
+    @Operation(summary = "Get audit trail for a claim",
+            security = @SecurityRequirement(name = "Bearer Auth"))
+    public ResponseEntity<List<AuditResponse>> getAudit(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal UserDetails currentUser) {
+
+        return ResponseEntity.ok(auditService.getAuditTrail(id, currentUser));
     }
 }
