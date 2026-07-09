@@ -14,7 +14,7 @@ CREATE TABLE expense_claims
 (
     id               BIGINT PRIMARY KEY AUTO_INCREMENT,
     employee_id      BIGINT         NOT NULL REFERENCES expense_users (id),
-    description      VARCHAR(255)   NOT NULL,
+    description      VARCHAR(255),
     amount           DECIMAL(10, 2) NOT NULL,
     date             DATE           NOT NULL,
     category         VARCHAR(20)    NOT NULL,
