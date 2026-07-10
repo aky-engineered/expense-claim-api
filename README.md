@@ -62,7 +62,7 @@ Here is a breakdown of the API endpoints and the corresponding authorization via
 | **POST**  |       /api/auth/login       |                |                    returns JWT (public) |
 | **POST**  |         /api/claims         |   **EMPLOYEE** |                  EMPLOYEE submits claim |
 | **GET**   |         /api/claims         |   **EMPLOYEE** | EMPLOYEE can view thier own claims only |
-| **GET**   |      /api/claims/{id}!      |   **EMPLOYEE** |       EMPLOYEE can view thier own claim |
+| **GET**   |      /api/claims/{id}       |   **EMPLOYEE** |       EMPLOYEE can view thier own claim |
 | **GET**   |   /api/approvals/pending    |   **APPROVER** |    APPROVER can view all pending claims |
 | **POST**  | /api/approvals/{id}/approve |   **APPROVER** |               APPROVER approves a claim |
 | **POST**  | /api/approvals/{id}/reject  |   **APPROVER** |                APPROVER rejects a claim |
